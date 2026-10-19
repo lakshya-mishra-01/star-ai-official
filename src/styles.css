@@ -180,3 +180,20 @@
 @utility animate-dot {
   animation: dot 1.2s infinite ease-in-out;
 }
+
+@utility star-prose {
+  line-height: 1.7;
+  font-size: 15px;
+  & p { margin: 0.6em 0; }
+  & h1, & h2, & h3 { font-weight: 600; margin: 1em 0 0.4em; }
+  & ul { list-style: disc; padding-left: 1.4em; }
+  & ol { list-style: decimal; padding-left: 1.4em; }
+  & li { margin: 0.25em 0; }
+  & a { color: var(--cyan); text-decoration: underline; }
+  & code { background: var(--muted); padding: 0.1em 0.35em; border-radius: 0.35em; font-size: 0.9em; }
+  & pre { background: oklch(0.1 0.02 270); border: 1px solid var(--border); padding: 1em; border-radius: 0.8em; overflow-x: auto; margin: 0.8em 0; }
+  & pre code { background: transparent; padding: 0; }
+  & blockquote { border-left: 2px solid var(--violet); padding-left: 1em; color: var(--muted-foreground); }
+  & table { border-collapse: collapse; margin: 0.8em 0; }
+  & th, & td { border: 1px solid var(--border); padding: 0.4em 0.7em; }
+}
