@@ -41,7 +41,7 @@ export function ChatShell({ threadId }: { threadId: string }) {
 
   async function newChat() {
     const { data, error } = await supabase.from("threads").insert({}).select("id").single();
-    if (error || !data) return toast.error("Couldn't start a new chat.");
+    if (error || !data) { toast.error("Couldn't start a new chat."); return; }
     await qc.invalidateQueries({ queryKey: ["threads"] });
     setOpen(false);
     navigate({ to: "/chat/$threadId", params: { threadId: data.id } });
@@ -49,7 +49,7 @@ export function ChatShell({ threadId }: { threadId: string }) {
 
   async function remove(id: string) {
     const { error } = await supabase.from("threads").delete().eq("id", id);
-    if (error) return toast.error("Couldn't delete that chat.");
+    if (error) { toast.error("Couldn't delete that chat."); return; }
     await qc.invalidateQueries({ queryKey: ["threads"] });
     if (id === threadId) navigate({ to: "/chat", replace: true });
   }

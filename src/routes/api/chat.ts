@@ -13,8 +13,8 @@ export const Route = createFileRoute("/api/chat")({
       POST: async ({ request }) => {
         const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
         if (!token) return json(401, "Please sign in to chat.");
-        const url = process.env.SUPABASE_URL!;
-        const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+        const url = process.env["SUPABASE_URL"]!;
+        const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
         const supabase = createClient<Database>(url, key, {
           auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
           global: {
@@ -43,12 +43,12 @@ export const Route = createFileRoute("/api/chat")({
         const { data: thread } = await supabase.from("threads").select("id,title").eq("id", threadId).maybeSingle();
         if (!thread) return json(404, "Conversation not found.");
 
-        const apiKey = process.env.LOVABLE_API_KEY;
+        const apiKey = process.env["LOVABLE_API_KEY"];
         if (!apiKey) return json(500, "STAR isn't connected to an AI model yet.");
 
         // Save latest user message
         const last = messages[messages.length - 1];
-        if (last.role === "user") {
+        if (last && last.role === "user") {
           const { error } = await supabase.from("messages").upsert(
             { thread_id: threadId, message_id: last.id, role: "user", parts: last.parts as never },
             { onConflict: "thread_id,message_id" },
