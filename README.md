@@ -2,6 +2,12 @@
 
 An AI-powered web application built to explore useful AI features through a modern and intuitive interface.
 
+## 📸 Preview
+
+![STAR AI Preview 1](Dashboard.png)
+![STAR AI Preview 2](Preview.png)
+![STAR AI Preview 3](ChatBoard.png)
+
 ## ✨ Features
 - Modern, responsive user interface
 - AI-powered features (as implemented)
