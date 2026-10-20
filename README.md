@@ -14,7 +14,7 @@ An AI-powered web application built to explore useful AI features through a mode
 - Database ORM: Drizzle ORM
 - Database: PostgreSQL
 - Routing: TanStack Router
-- AI: [Your AI provider, if applicable]
+- AI: OpenAI API
 
 ## 🚀 Getting Started
 1. Clone this repository.
