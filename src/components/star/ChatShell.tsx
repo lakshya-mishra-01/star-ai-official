@@ -137,7 +137,7 @@ export function ChatShell({ threadId }: { threadId: string }) {
               <PanelLeftOpen className="size-5" />
             </button>
           )}
-          {(collapsed || true) && <span className={cn(!collapsed && "md:hidden")}><StarWordmark className="text-sm" /></span>}
+          <span className={cn(!collapsed && "md:hidden")}><StarWordmark className="text-sm" /></span>
         </div>
         <ThreadLoader key={threadId} threadId={threadId} name={firstName(user)} />
       </main>

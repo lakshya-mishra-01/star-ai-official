@@ -191,7 +191,7 @@
   & li { margin: 0.25em 0; }
   & a { color: var(--cyan); text-decoration: underline; }
   & code { background: var(--muted); padding: 0.1em 0.35em; border-radius: 0.35em; font-size: 0.9em; }
-  & pre { background: oklch(0.1 0.02 270); border: 1px solid var(--border); padding: 1em; border-radius: 0.8em; overflow-x: auto; margin: 0.8em 0; }
+  & pre { margin: 0; }
   & pre code { background: transparent; padding: 0; }
   & blockquote { border-left: 2px solid var(--violet); padding-left: 1em; color: var(--muted-foreground); }
   & table { border-collapse: collapse; margin: 0.8em 0; }
@@ -210,3 +210,6 @@
 @utility animate-float {
   animation: float 6s ease-in-out infinite;
 }
+
+:root { --code: oklch(0.1 0.02 270); }
+@theme inline { --color-code: var(--code); }

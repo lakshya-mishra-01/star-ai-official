@@ -46,6 +46,12 @@ export const Route = createFileRoute("/api/chat")({
         const apiKey = process.env["LOVABLE_API_KEY"];
         if (!apiKey) return json(500, "STAR isn't connected to an AI model yet.");
 
+        // Drop stored messages no longer in history (e.g. after Retry)
+        const keep = messages.map((m) => m.id);
+        const { data: stored } = await supabase.from("messages").select("message_id").eq("thread_id", threadId);
+        const stale = (stored ?? []).map((r) => r.message_id).filter((id) => !keep.includes(id));
+        if (stale.length) await supabase.from("messages").delete().eq("thread_id", threadId).in("message_id", stale);
+
         // Save latest user message
         const last = messages[messages.length - 1];
         if (last && last.role === "user") {
