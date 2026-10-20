@@ -197,3 +197,16 @@
   & table { border-collapse: collapse; margin: 0.8em 0; }
   & th, & td { border: 1px solid var(--border); padding: 0.4em 0.7em; }
 }
+
+@utility bg-hero-fade {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--background) 30%, transparent) 0%, transparent 40%, var(--background) 100%);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+}
