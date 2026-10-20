@@ -8,8 +8,12 @@ An AI-powered web application built to explore useful AI features through a mode
 - Simple and user-friendly experience
 
 ## 🛠️ Tech Stack
-- Frontend: [Your framework]
-- Language: [Your language]
+- Frontend: React
+- Language: TypeScript
+- Build Tool: Vite
+- Database ORM: Drizzle ORM
+- Database: PostgreSQL
+- Routing: TanStack Router
 - AI: [Your AI provider, if applicable]
 
 ## 🚀 Getting Started
