@@ -316,7 +316,7 @@ function CopyButton({ text, label }: { text: string; label?: string }) {
   );
 }
 
-function CodeBlock({ children, className }: { children?: ReactNode; className?: string }) {
+function CodeBlock({ children, className }: { children?: ReactNode; className?: string | undefined }) {
   const code = String(children ?? "").replace(/\n$/, "");
   const lang = /language-(\w+)/.exec(className ?? "")?.[1];
   return (
