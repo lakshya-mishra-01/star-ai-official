@@ -1,24 +1,18 @@
-# Star ai
+# STAR AI 🌌
+### Your AI. Your Universe.
 
-Implement exactly the screenshot and nothing else
+STAR AI is an AI-powered web project designed to
+make interacting with AI feel simple and intuitive.
 
-This project was built with [Lovable](https://lovable.dev).
+## Features
+- Modern, futuristic interface
+- AI chat experience
+- Responsive design
 
-## Build with Lovable
+## Creator
+Lakshya Mishra
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/c12382b7-5cf9-4fb1-9979-d4c42e33778c).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+## Built With
+- TypeScript
+- CSS
+- AI-assisted development using Lovable
