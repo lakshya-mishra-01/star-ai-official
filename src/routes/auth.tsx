@@ -1,21 +1,21 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
-import "@lovable.dev/cloud-auth-js/styles.css";
+import { signInWithGoogle } from "@/lib/google-auth";
 import { StarLogo } from "@/components/star/StarLogo";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — STAR AI" },
-      { name: "description", content: "Sign in to STAR AI to start chatting and keep your conversations." },
-      { property: "og:title", content: "Sign in — STAR AI" },
-      { property: "og:description", content: "Sign in to STAR AI. Your AI. Your Universe." },
+      { title: "Google sign-in — STAR AI" },
+      { name: "description", content: "Sign in securely with Google to continue your STAR AI conversations." },
+      { property: "og:title", content: "Google sign-in — STAR AI" },
+      { property: "og:description", content: "Your AI. Your Universe. Continue to STAR AI with Google." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AuthPage,
@@ -23,116 +23,67 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const { data: user, isPending } = useQuery({
+    queryKey: ["me"],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getUser();
+      return data.user;
+    },
+    staleTime: 0,
+    retry: false,
+  });
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/chat", replace: true });
-    });
-    const { data } = supabase.auth.onAuthStateChange((e, s) => {
-      if (e === "SIGNED_IN" && s) navigate({ to: "/chat", replace: true });
-    });
-    return () => data.subscription.unsubscribe();
-  }, [navigate]);
+    if (user) navigate({ to: "/chat", replace: true });
+  }, [user, navigate]);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  useEffect(() => {
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    const search = new URLSearchParams(window.location.search);
+    if (hash.has("error") || search.has("error")) {
+      setError("Google sign-in wasn’t completed. Please try again.");
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, []);
+
+  async function oauth() {
+    if (busy) return;
     setBusy(true);
+    setError("");
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin + "/chat" },
-        });
-        if (error) throw error;
-        setSent(true);
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      }
+      const result = await signInWithGoogle(window.location.origin);
+      if (result.redirected) return;
+      const { data, error: sessionError } = await supabase.auth.getUser();
+      if (sessionError || !data.user) throw new Error("Your Google session could not be confirmed. Please try again.");
+      await queryClient.invalidateQueries({ queryKey: ["me"] });
+      await navigate({ to: "/chat", replace: true });
     } catch (err) {
-      toast.error((err as Error).message);
+      setError(err instanceof Error ? err.message : "Google sign-in failed. Please try again.");
     } finally {
       setBusy(false);
     }
   }
 
-  async function oauth(provider: "google" | "lovable") {
-    const r = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin + "/auth" });
-    if (r.error) toast.error(r.error.message ?? "Sign-in failed");
-  }
-
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4">
+    <div className="relative flex min-h-dvh flex-col items-center justify-center px-5 py-12">
       <div className="starfield pointer-events-none absolute inset-0 opacity-60" />
-      <div className="glass relative w-full max-w-md animate-rise rounded-3xl p-8 shadow-glow">
-        <Link to="/" className="mx-auto mb-6 flex w-fit flex-col items-center gap-3">
-          <StarLogo className="size-14" animated />
-          <span className="font-display text-xl font-semibold">
-            STAR <span className="text-gradient">AI</span>
-          </span>
+      <main className="relative w-full max-w-sm animate-rise text-center">
+        <Link to="/" className="mx-auto mb-8 flex w-fit flex-col items-center gap-4">
+          <StarLogo className="size-16" animated />
+          <span className="font-display text-3xl font-semibold">STAR <span className="text-gradient">AI</span></span>
         </Link>
-        {sent ? (
-          <div className="text-center">
-            <h1 className="text-2xl font-semibold">Check your inbox</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              We sent a confirmation link to {email}. Open it to activate your account.
-            </p>
-          </div>
-        ) : (
-          <>
-            <h1 className="text-center text-2xl font-semibold">
-              {mode === "signin" ? "Welcome back" : "Create your account"}
-            </h1>
-            <p className="mt-1 text-center text-sm text-muted-foreground">Your AI. Your Universe.</p>
-            <div className="mt-6 space-y-3">
-              <Button variant="glass" className="w-full" onClick={() => oauth("google")}>
-                Continue with Google
-              </Button>
-              <button type="button" className="lovable-auth-button w-full" onClick={() => oauth("lovable")}>
-                Continue with Lovable
-              </button>
-            </div>
-            <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-              <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
-            </div>
-            <form onSubmit={submit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <Button type="submit" variant="hero" className="w-full" disabled={busy}>
-                {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
-              </Button>
-            </form>
-            <p className="mt-5 text-center text-sm text-muted-foreground">
-              {mode === "signin" ? "New to STAR?" : "Already have an account?"}{" "}
-              <button
-                className="font-medium text-cyan hover:underline"
-                onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-              >
-                {mode === "signin" ? "Create an account" : "Sign in"}
-              </button>
-            </p>
-          </>
-        )}
-      </div>
+        <h1 className="font-display text-2xl font-semibold">Welcome to STAR</h1>
+        <p className="mt-3 text-sm text-muted-foreground">Your AI. Your Universe.</p>
+        <Button variant="outline" size="lg" className="mt-9 h-12 w-full gap-3 rounded-lg" disabled={busy || isPending || Boolean(user)} onClick={oauth}>
+          {busy || isPending || user ? <Loader2 className="size-5 animate-spin" aria-hidden="true" /> : <img src="/google-logo.svg" alt="" className="size-5" />}
+          {busy ? "Connecting to Google…" : isPending || user ? "Checking your session…" : "Continue with Google"}
+        </Button>
+        {error && <p role="alert" className="mt-4 break-words text-sm text-destructive">{error}</p>}
+      </main>
+      <footer className="absolute bottom-5 px-5 text-center text-xs text-muted-foreground">STAR AI © 2026 · Built by Lakshya Mishra</footer>
     </div>
   );
 }
