@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "STAR AI — Meet STAR. Think Beyond." },
       { name: "description", content: "Your intelligent AI companion for ideas, learning, coding and everything in between. Built by Lakshya Mishra." },
       { property: "og:title", content: "STAR AI — Meet STAR. Think Beyond." },

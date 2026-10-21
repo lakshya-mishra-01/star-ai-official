@@ -80,7 +80,8 @@ export function ChatShell({ threadId }: { threadId: string }) {
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) { toast.error("Couldn’t sign out. Please try again."); return; }
     navigate({ to: "/auth", replace: true });
   }
 

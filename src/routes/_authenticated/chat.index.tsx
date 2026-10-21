@@ -2,7 +2,14 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/chat/")({
-  head: () => ({ meta: [{ title: "Chat — STAR AI" }, { name: "description", content: "Chat with STAR AI." }] }),
+  head: () => ({ meta: [
+    { title: "Chat workspace — STAR AI" },
+    { name: "description", content: "Continue your conversations in the STAR AI workspace." },
+    { property: "og:title", content: "Chat workspace — STAR AI" },
+    { property: "og:description", content: "Your private STAR AI chat workspace." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+  ] }),
   beforeLoad: async () => {
     const { data: existing } = await supabase
       .from("threads")
