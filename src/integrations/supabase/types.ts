@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      guest_daily_usage: {
+        Row: {
+          bucket: string
+          requests: number
+          usage_day: string
+        }
+        Insert: {
+          bucket: string
+          requests?: number
+          usage_day?: string
+        }
+        Update: {
+          bucket?: string
+          requests?: number
+          usage_day?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           created_at: string
@@ -52,6 +70,24 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          username?: string
+        }
+        Relationships: []
+      }
       threads: {
         Row: {
           created_at: string
@@ -81,7 +117,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_star_allowance: {
+        Args: { bucket_key: string; daily_limit: number }
+        Returns: boolean
+      }
+      star_login_email: { Args: { candidate: string }; Returns: string }
+      star_username_available: { Args: { candidate: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
