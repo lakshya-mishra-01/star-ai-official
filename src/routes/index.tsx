@@ -36,9 +36,12 @@ function Index() {
           <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#features" className="hover:text-foreground transition-colors">Features</a>
             <a href="#preview" className="hover:text-foreground transition-colors">Preview</a>
-            <Link to="/chat" className="hover:text-foreground transition-colors">Chat</Link>
+            <Link to="/guest" className="hover:text-foreground transition-colors">Chat</Link>
           </nav>
-          <Button variant="hero" size="sm" asChild><Link to="/chat">Start Chatting</Link></Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" asChild><Link to="/auth" search={{ mode: "signin" }}>Log In</Link></Button>
+            <Button variant="outline" size="sm" asChild><Link to="/auth" search={{ mode: "signup" }}>Create Account</Link></Button>
+          </div>
         </div>
       </header>
 
@@ -56,7 +59,7 @@ function Index() {
           </p>
           <div className="mt-10 flex animate-rise flex-wrap justify-center gap-3 [animation-delay:300ms]">
             <Button variant="hero" size="lg" className="h-12 px-8 text-base" asChild>
-              <Link to="/chat">Start Chatting <ArrowRight /></Link>
+              <Link to="/guest">Start Chatting <ArrowRight /></Link>
             </Button>
             <Button variant="glass" size="lg" className="h-12 px-8 text-base" asChild>
               <a href="#features">Explore STAR</a>

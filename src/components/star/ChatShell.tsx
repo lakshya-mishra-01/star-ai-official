@@ -162,6 +162,25 @@ export function ChatShell({ threadId }: { threadId: string }) {
   );
 }
 
+export function GuestChatShell() {
+  const [conversation, setConversation] = useState(0);
+  return (
+    <div className="flex h-dvh flex-col overflow-hidden">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
+        <Link to="/"><StarWordmark /></Link>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Guest</span>
+          <Button size="sm" variant="ghost" onClick={() => setConversation(v => v + 1)}><Plus /> New chat</Button>
+          <Button size="sm" variant="outline" asChild><Link to="/auth" search={{ mode: "signup" }}>Create Account</Link></Button>
+          <Button size="sm" variant="ghost" asChild><Link to="/auth" search={{ mode: "signin" }}>Log In</Link></Button>
+        </div>
+      </header>
+      <p className="px-4 py-2 text-center text-xs text-muted-foreground">Guest · History ends when you leave this page. 5 AI messages per day.</p>
+      <ChatWindow key={conversation} threadId={`guest-${conversation}`} initial={[]} name="Guest" guest />
+    </div>
+  );
+}
+
 function ThreadLoader({ threadId, name }: { threadId: string; name: string }) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["messages", threadId],
@@ -181,7 +200,7 @@ function textOf(m: UIMessage) {
   return m.parts.map((p) => (p.type === "text" ? p.text : "")).join("");
 }
 
-function ChatWindow({ threadId, initial, name }: { threadId: string; initial: UIMessage[]; name: string }) {
+function ChatWindow({ threadId, initial, name, guest = false }: { threadId: string; initial: UIMessage[]; name: string; guest?: boolean }) {
   const qc = useQueryClient();
   const [input, setInput] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -192,9 +211,13 @@ function ChatWindow({ threadId, initial, name }: { threadId: string; initial: UI
     id: threadId,
     messages: initial,
     transport: new DefaultChatTransport({
-      api: "/api/chat",
-      body: { threadId },
+      api: guest ? "/api/public/guest-chat" : "/api/chat",
+      body: guest ? {} : { threadId },
+      ...(guest ? { prepareSendMessagesRequest: ({ messages }: { messages: UIMessage[] }) => ({
+        body: { messages: messages.map(m => ({ id: m.id, role: m.role, parts: m.parts.filter(p => p.type === "text") })) },
+      }) } : {}),
       headers: async (): Promise<Record<string, string>> => {
+        if (guest) return {};
         const { data } = await supabase.auth.getSession();
         return data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {};
       },
@@ -205,7 +228,7 @@ function ChatWindow({ threadId, initial, name }: { threadId: string; initial: UI
       setErr(msg || "Something went wrong. Please try again.");
     },
     onFinish: () => {
-      qc.invalidateQueries({ queryKey: ["threads"] });
+      if (!guest) qc.invalidateQueries({ queryKey: ["threads"] });
       inputRef.current?.focus();
     },
   });
@@ -220,7 +243,7 @@ function ChatWindow({ threadId, initial, name }: { threadId: string; initial: UI
     setErr(null);
     setInput("");
     sendMessage({ text: t });
-    setTimeout(() => qc.invalidateQueries({ queryKey: ["threads"] }), 800);
+    if (!guest) setTimeout(() => qc.invalidateQueries({ queryKey: ["threads"] }), 800);
     inputRef.current?.focus();
   }
 
