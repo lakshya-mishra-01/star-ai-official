@@ -1,4 +1,5 @@
 # Authentication update
+- [ ] Fix reported TypeScript errors and verify the preview build.
 - [ ] Add public guest chat with a server-enforced daily allowance and limit notice.
 - [ ] Add optional accounts with unique usernames, recovery email, signup/login/reset and private history.
 - [ ] Preserve branding and landing actions; verify guest chat, accounts, duplicate usernames and isolation.
