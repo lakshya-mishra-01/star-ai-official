@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 
 type Mode = "signin" | "signup" | "forgot";
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): { mode: Mode } => ({ mode: search.mode === "signup" ? "signup" : search.mode === "forgot" ? "forgot" : "signin" }),
+  validateSearch: (search: Record<string, unknown>): { mode: Mode } => ({ mode: search["mode"] === "signup" ? "signup" : search["mode"] === "forgot" ? "forgot" : "signin" }),
   head: () => ({ meta: [
     { title: "Your account — STAR AI" },
     { name: "description", content: "Create an optional STAR AI account to save your conversations." },
@@ -51,7 +51,7 @@ function AuthPage() {
     return () => { active = false; clearTimeout(timer); };
   }, [username, mode]);
 
-  async function submit(event: React.FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
     setError(""); setNotice(""); setBusy(true);
     try {
