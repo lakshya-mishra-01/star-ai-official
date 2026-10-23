@@ -5,7 +5,7 @@ export const passwordSchema = z.string().min(10, "Use at least 10 characters.").
 export const signupSchema = z.object({ username: usernameSchema, email: z.string().trim().email().max(254), password: passwordSchema });
 export const GUEST_DAILY_LIMIT = 5;
 export const GUEST_GLOBAL_DAILY_LIMIT = 100;
-export const GUEST_LIMIT_MESSAGE = "You have exceeded the daily AI limit. Subscribe now — coming soon. Built by Lakshya Mishra.";
+export const GUEST_LIMIT_MESSAGE = "You have exceeded the daily AI limit. Subscribe now — coming soon......[SUBSCRIPTION MODEL WILL BE AVAILABLE SOON!!!]\n\n";
 
 export const chatBodySchema = z.object({
   threadId: z.string().uuid().optional(),
