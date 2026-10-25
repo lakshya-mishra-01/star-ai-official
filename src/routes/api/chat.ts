@@ -43,8 +43,9 @@ export const Route = createFileRoute("/api/chat")({
         const { data: thread } = await supabase.from("threads").select("id,title").eq("id", threadId).maybeSingle();
         if (!thread) return json(404, "Conversation not found.");
 
+        const bytezKey = process.env["BYTEZ_API_KEY"];
         const apiKey = process.env["LOVABLE_API_KEY"];
-        if (!apiKey) return json(500, "STAR isn't connected to an AI model yet.");
+        if (!bytezKey && !apiKey) return json(500, "STAR isn't connected to an AI model yet.");
 
         // Drop stored messages no longer in history (e.g. after Retry)
         const keep = messages.map((m) => m.id);
@@ -66,9 +67,35 @@ export const Route = createFileRoute("/api/chat")({
           await supabase.from("threads").update(update).eq("id", threadId);
         }
 
+        const modelMessages = await convertToModelMessages(messages);
+
+        // Bytez is the primary provider when BYTEZ_API_KEY is configured;
+        // the Lovable AI gateway remains as the fallback.
+        if (bytezKey) {
+          const { streamBytezResponse } = await import("@/lib/ai/bytez.server");
+          return streamBytezResponse({
+            apiKey: bytezKey,
+            modelId: process.env["BYTEZ_MODEL_ID"],
+            messages: modelMessages,
+            signal: request.signal,
+            onFinish: async (message) => {
+              const { error } = await supabase.from("messages").upsert(
+                {
+                  thread_id: threadId,
+                  message_id: message.id,
+                  role: "assistant",
+                  parts: message.parts as never,
+                },
+                { onConflict: "thread_id,message_id" },
+              );
+              if (error) console.error("save assistant message", error);
+            },
+          });
+        }
+
         const { streamStar } = await import("@/lib/ai/chat.server");
         const { withLovableAiGatewayRunIdHeader } = await import("@/lib/ai/run-id.server");
-        const { result, runIdFetch } = streamStar(request, apiKey, await convertToModelMessages(messages));
+        const { result, runIdFetch } = streamStar(request, apiKey!, modelMessages);
 
         const res = result.toUIMessageStreamResponse({
           originalMessages: messages,

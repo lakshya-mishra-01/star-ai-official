@@ -11,6 +11,7 @@
 
 ## STAR AI
 - Chat streams through the server route `src/routes/api/chat.ts` (bearer-token verified, RLS as user); model calls live in `src/lib/ai/*.server.ts` so the API key never reaches the browser.
+- AI provider selection: when `BYTEZ_API_KEY` is set, replies come from the Bytez Model API (`src/lib/ai/bytez.server.ts`, model from `BYTEZ_MODEL_ID`, default `Qwen/Qwen3-4B`); otherwise the Lovable AI gateway path in `src/lib/ai/chat.server.ts` is used. Both return AI SDK UI message streams so the chat UI is provider-agnostic.
 - Threads/messages are stored in Lovable Cloud tables `threads` and `messages` (AI SDK UIMessage parts as jsonb); each thread has its own URL `/chat/$threadId`.
 - Google OAuth uses the Cloud-managed helper through `src/lib/google-auth.ts` and returns to public `/auth`; validated user state drives navigation to protected chat because the token exchange must finish before the route gate runs.
 - Subscribe to identity changes only in the root; auth screens use the shared `me` query with `getUser()` so session checks are validated without competing auth listeners.

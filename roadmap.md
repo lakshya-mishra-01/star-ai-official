@@ -1,3 +1,7 @@
+# Task roadmap
+- [x] Integrate Bytez Model API server-side (src/lib/ai/bytez.server.ts) with Lovable gateway fallback; chat + guest chat routes prefer Bytez when BYTEZ_API_KEY is set. Typecheck, 13 tests, and preview build pass.
+- [ ] Bytez live reply is untested: BYTEZ_API_KEY is not stored yet (secure form requested). Model defaults to Qwen/Qwen3-4B, overridable via BYTEZ_MODEL_ID. For Vercel, BYTEZ_API_KEY must also be added in Vercel project env vars.
+
 # Authentication update
 - [x] Fix reported TypeScript errors and verify the preview build; eight existing tests pass, sign-in redirect and guest screen render without runtime errors.
 - [ ] Add public guest chat with a server-enforced daily allowance and limit notice.
