@@ -43,8 +43,9 @@ export const Route = createFileRoute("/api/chat")({
         const { data: thread } = await supabase.from("threads").select("id,title").eq("id", threadId).maybeSingle();
         if (!thread) return json(404, "Conversation not found.");
 
+        const bytezKey = process.env["BYTEZ_API_KEY"];
         const apiKey = process.env["LOVABLE_API_KEY"];
-        if (!apiKey) return json(500, "STAR isn't connected to an AI model yet.");
+        if (!bytezKey && !apiKey) return json(500, "STAR isn't connected to an AI model yet.");
 
         // Drop stored messages no longer in history (e.g. after Retry)
         const keep = messages.map((m) => m.id);
