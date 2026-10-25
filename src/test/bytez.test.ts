@@ -5,8 +5,8 @@ import { bytezErrorMessage, DEFAULT_BYTEZ_MODEL, toBytezMessages } from "@/lib/a
 describe("toBytezMessages", () => {
   it("prepends the STAR system prompt", () => {
     const out = toBytezMessages([{ role: "user", content: "hi" }]);
-    expect(out[0].role).toBe("system");
-    expect(out[0].content).toContain("STAR");
+    expect(out[0]!.role).toBe("system");
+    expect(out[0]!.content).toContain("STAR");
     expect(out[1]).toEqual({ role: "user", content: "hi" });
   });
 

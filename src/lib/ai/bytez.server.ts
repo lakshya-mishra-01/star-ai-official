@@ -43,9 +43,9 @@ export function bytezErrorMessage(status: number | undefined): string {
 
 type StreamBytezOptions = {
   apiKey: string;
-  modelId?: string;
+  modelId?: string | undefined;
   messages: ModelMessage[];
-  signal?: AbortSignal;
+  signal?: AbortSignal | undefined;
   onFinish?: (message: UIMessage) => void | Promise<void>;
 };
 
@@ -72,7 +72,7 @@ export function streamBytezResponse({ apiKey, modelId, messages, signal, onFinis
           stream: true,
           params: { temperature: 0.7, max_new_tokens: 2048 },
         }),
-        signal,
+        signal: signal ?? null,
       });
 
       if (!response.ok || !response.body) {
