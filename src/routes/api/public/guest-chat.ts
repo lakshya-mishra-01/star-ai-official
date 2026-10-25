@@ -24,9 +24,19 @@ export const Route = createFileRoute("/api/public/guest-chat")({
     const global = await supabaseAdmin.rpc("claim_star_allowance", { bucket_key: "all-guests", daily_limit: GUEST_GLOBAL_DAILY_LIMIT });
     if (global.error) return Response.json({ error: "Guest chat is temporarily unavailable." }, { status: 503 });
     if (!global.data) return Response.json({ error: GUEST_LIMIT_MESSAGE }, { status: 429 });
+    const modelMessages = await convertToModelMessages(body.data.messages);
+    if (bytezKey) {
+      const { streamBytezResponse } = await import("@/lib/ai/bytez.server");
+      return streamBytezResponse({
+        apiKey: bytezKey,
+        modelId: process.env["BYTEZ_MODEL_ID"],
+        messages: modelMessages,
+        signal: request.signal,
+      });
+    }
     const { streamStar } = await import("@/lib/ai/chat.server");
     const { withLovableAiGatewayRunIdHeader } = await import("@/lib/ai/run-id.server");
-    const { result, runIdFetch } = streamStar(request, apiKey, await convertToModelMessages(body.data.messages));
+    const { result, runIdFetch } = streamStar(request, apiKey!, modelMessages);
     return withLovableAiGatewayRunIdHeader(result.toUIMessageStreamResponse({
       originalMessages: body.data.messages,
       sendReasoning: true,
